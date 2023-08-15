@@ -1,29 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Socket.io Chat App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap');
+
+    /* Reset default browser styles */
+    body, h1, h2, div, p {
+      margin: 0;
+      padding: 0;
+      background-color: rgb(78, 74, 74);
+      color: white;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Chat app layout */
+    .chat-app {
+      display: flex;
+      height: 100vh;
+      background-color: rgb(78, 74, 74);
+    }
+
+    .sidebar {
+      width: 300px;
+      background-color: #f0f0f0;
+      padding: 20px;
+      box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+      background-color: rgb(78, 74, 74);
+      border-right: 1px solid #ddd;
+    }
+
+    .header {
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      background-color: rgb(78, 74, 74);
+    }
+
+    .contacts {
+      overflow-y: auto;
+    }
+
+    .contact {
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .sent {
+      background-color: rgb(177, 177, 177);
+      color: black;
+      align-self: flex-end;
+    }
+
+    .received {
+      background-color: rgb(184, 162, 151);
+      color: black;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .online-users {
+      list-style: none;
+      padding: 0;
+    }
+
+    input[type="text"] {
+      font-family: 'Space Grotesk', sans-serif;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    #user-name {
+      width: max-content;
+      margin-top: 10px;
+    }
+
+    button {
+      font-family: 'Space Grotesk', sans-serif;
+      padding: 10px 20px;
+      background-color: black;
+      color: #FFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .chat-app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        box-shadow: none;
+      }
+
+      .chat {
+        flex: 1;
+        padding: 20px;
+      }
+
+      .header {
+        border-bottom: 1px solid;
+        padding-bottom: 5px;
+      }
+    }
+  </style>
+  <title>SwiftChat</title>
 </head>
 <body>
-  <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-  </form>
+  <div class="chat-app">
+    <div class="sidebar">
+      <div class="header">
+        <h1>SwiftChat</h1>
+        <!-- Display the list of online users -->
+        <ul class="online-users">
+          <!-- List items will be dynamically added here -->
+        </ul>
+      </div>
+      <div class="contacts">
+        <!-- ... Your existing contacts ... -->
+      </div>
+    </div>
+    <div class="chat">
+      <div class="header">
+        <!-- Display the user's name above the chat messages -->
+        <h2 id="user-name-display">Your Name</h2>
+      </div>
+      <div class="messages">
+        <!-- Chat messages will be dynamically added here -->
+      </div>
+      <!-- New input field for user's name -->
+      <input type="text" id="user-name" placeholder="Your Name">
+      <div class="input-area">
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add the Socket.io script -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    $(function () {
-      var socket = io();
+    // Establish a connection with the server
+    const socket = io();
 
-      $('form').submit(function () {
-        socket.emit('chat message', $('#input').val());
-        $('#input').val('');
-        return false;
-      });
+    // DOM elements
+    const userNameInput = document.getElementById('user-name');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const messagesContainer = document.querySelector('.messages');
 
-      socket.on('chat message', function (msg) {
-        $('#messages').append($('<li>').text(msg));
-      });
+    // Handle sending messages
+     sendButton.addEventListener('click', () => {
+      const userName = userNameInput.value.trim();
+      const message = messageInput.value.trim();
+      if (userName !== '' && message !== '') {
+        updateUserNameDisplay(userName); // Update the user name display
+        socket.emit('chat message', userName + ': ' + message);
+        messageInput.value = '';
+      }
     });
+  
+    // Handle receiving messages
+    socket.on('chat message', (msg) => {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = msg;
+      
+      if (msg.startsWith(userNameInput.value.trim() + ': ')) {
+        messageElement.classList.add('message', 'sent');
+      } else {
+        messageElement.classList.add('message', 'received');
+      }
+      
+      messagesContainer.appendChild(messageElement);
+    });
+
+    // Update the user name display
+    function updateUserNameDisplay(userName) {
+      const userNameDisplay = document.getElementById('user-name-display');
+      userNameDisplay.textContent = userName;
+    }
+
+    // Keep track of online users
+    const onlineUsersList = document.querySelector('.online-users');
+
+    // Handle a new user connecting to the chat
+    socket.on('user connected', (userName) => {
+      const userItem = document.createElement('li');
+      userItem.textContent = userName;
+      onlineUsersList.appendChild(userItem);
+    });
+
+    // Handle a user disconnecting from the chat
+    socket.on('user disconnected', (userName) => {
+      const userItems = onlineUsersList.getElementsByTagName('li');
+      for (const userItem of userItems) {
+        if (userItem.textContent === userName) {
+          userItem.remove();
+          break;
+        }
+      }
+    });
+
   </script>
 </body>
 </html>
