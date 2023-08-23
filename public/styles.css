@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap');
+
+/* Reset default browser styles */
+body, h1, h2, div, p {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(78, 74, 74);
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Chat app layout */
+.chat-app {
+    display: flex;
+    height: 100vh;
+    background-color: rgb(78, 74, 74);
+}
+
+.sidebar {
+    width: 300px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+    background-color: rgb(78, 74, 74);
+    border-right: 1px solid #ddd;
+}
+
+.header {
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    background-color: rgb(78, 74, 74);
+}
+
+.contacts {
+    overflow-y: auto;
+}
+
+.contact {
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 225px);
+    flex-wrap: wrap;
+}
+
+.messages::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+.messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background: rgba(243, 240, 240, 0.877);
+    border-radius: 0.25rem;
+}
+
+.message {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    word-wrap: break-word;
+    overflow: hidden;
+    flex-basis: 100%;
+    max-width: calc(50% - 20px);
+    width: auto;  
+}
+
+.sent {
+    background-color: rgb(177, 177, 177);
+    color: black;
+    align-self: flex-end;
+    margin-left: auto; 
+}
+
+.received {
+    background-color: rgb(184, 162, 151);
+    color: black;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.input-area {
+    display: flex;
+    margin-top: 20px;
+}
+
+.online-users {
+    list-style: none;
+    padding: 0;
+}
+
+input[type="text"] {
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+#user-name {
+    width: max-content;
+    margin-top: 10px;
+}
+
+button {
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 10px 20px;
+    background-color: black;
+    color: #FFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+    .chat-app {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        box-shadow: none;
+    }
+
+    .chat {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .header {
+        border-bottom: 1px solid;
+        padding-bottom: 5px;
+    }
+}
