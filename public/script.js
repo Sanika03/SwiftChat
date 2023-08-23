@@ -59,28 +59,49 @@ messageInput.addEventListener('keydown', (event) => {
 });
 
 function sendMessage() {
-  const userName = userNameInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (userName === '') {
-    displayErrorMessage('user-name-error', 'Please enter a name');
-    return;
-  } else {
-    clearErrorMessage('user-name-error');
-  }
-
-  if (message === '') {
-    displayErrorMessage('message-error', 'Please type a message');
-    return;
-  } else {
-    clearErrorMessage('message-error');
-  }
-
-  updateUserNameDisplay(userName);
-  socket.emit('chat message', userName + ': ' + message);
-  messageInput.value = '';
-  messageInput.blur();
-}
+    const userName = userNameInput.value.trim();
+    let message = messageInput.value.trim();
+    let formattedMessage = message; // Default to original message
+  
+    const emojis = {
+      react: "⚛️",
+      woah: "😲",
+      hey: "👋",
+      lol: "😂",
+      like: "🤍",
+      congratulations: "🎉",
+    };
+  
+    if (userName === '') {
+      displayErrorMessage('user-name-error', 'Please enter a name');
+      return;
+    } else {
+      clearErrorMessage('user-name-error');
+    }
+  
+    if (message === '') {
+      displayErrorMessage('message-error', 'Please type a message');
+      return;
+    } else {
+      clearErrorMessage('message-error');
+    }
+  
+    // Check for each emoji keyword in the message
+    for (const keyword in emojis) {
+      if (message.toLowerCase().includes(keyword)) {
+        // Replace the keyword with the emoji
+        formattedMessage = formattedMessage.replace(
+          new RegExp(keyword, 'gi'), // 'gi' for global and case-insensitive search
+          emojis[keyword]
+        );
+      }
+    }
+  
+    updateUserNameDisplay(userName);
+    socket.emit('chat message', userName + ': ' + formattedMessage);
+    messageInput.value = '';
+    messageInput.blur();
+}  
 
 sendButton.addEventListener('click', sendMessage);
 
