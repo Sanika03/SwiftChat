@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="styles.css">
   <title>SwiftChat</title>
 </head>
@@ -39,7 +40,9 @@
       </div>
       <div class="input-area">
         <input type="text" id="message-input" placeholder="Type your message...">
-        <button id="send-button">Send</button>
+        <button id="send-button">
+          <i class="fas fa-paper-plane" style="color: #ffffff;"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -94,10 +97,13 @@
   messageInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      // const userName = userNameInput.value.trim();
+      const userName = userNameInput.value.trim();
       const message = messageInput.value.trim();
       
-      if (message === '') {
+      if (message === '' && userName === '') {
+        displayErrorMessage('message-error', 'Please type a message');
+        displayErrorMessage('user-name-error', 'Please enter a name');
+      } else if (message === '') {
         displayErrorMessage('message-error', 'Please type a message');
       } else {
         clearErrorMessage('message-error');
@@ -109,11 +115,24 @@
   function sendMessage() {
     const userName = userNameInput.value.trim();
     const message = messageInput.value.trim();
-    if (userName !== '' && message !== '') {
-      updateUserNameDisplay(userName);
-      socket.emit('chat message', userName + ': ' + message);
-      messageInput.value = '';
+
+    if (userName === '') {
+      displayErrorMessage('user-name-error', 'Please enter a name');
+      return;
+    } else {
+      clearErrorMessage('user-name-error');
     }
+
+    if (message === '') {
+      displayErrorMessage('message-error', 'Please type a message');
+      return;
+    } else {
+      clearErrorMessage('message-error');
+    }
+
+    updateUserNameDisplay(userName);
+    socket.emit('chat message', userName + ': ' + message);
+    messageInput.value = '';
     messageInput.blur();
   }
 
