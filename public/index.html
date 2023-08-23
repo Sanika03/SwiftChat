@@ -3,135 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap');
-
-    /* Reset default browser styles */
-    body, h1, h2, div, p {
-      margin: 0;
-      padding: 0;
-      background-color: rgb(78, 74, 74);
-      color: white;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
-    /* Chat app layout */
-    .chat-app {
-      display: flex;
-      height: 100vh;
-      background-color: rgb(78, 74, 74);
-    }
-
-    .sidebar {
-      width: 300px;
-      background-color: #f0f0f0;
-      padding: 20px;
-      box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
-      background-color: rgb(78, 74, 74);
-      border-right: 1px solid #ddd;
-    }
-
-    .header {
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      background-color: rgb(78, 74, 74);
-    }
-
-    .contacts {
-      overflow-y: auto;
-    }
-
-    .contact {
-      padding: 10px 0;
-      cursor: pointer;
-    }
-
-    .chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .message {
-      margin: 10px;
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    .sent {
-      background-color: rgb(177, 177, 177);
-      color: black;
-      align-self: flex-end;
-    }
-
-    .received {
-      background-color: rgb(184, 162, 151);
-      color: black;
-      align-self: flex-start;
-    }
-
-    .input-area {
-      display: flex;
-      margin-top: 20px;
-    }
-
-    .online-users {
-      list-style: none;
-      padding: 0;
-    }
-
-    input[type="text"] {
-      font-family: 'Space Grotesk', sans-serif;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      width: 100%;
-    }
-
-    #user-name {
-      width: max-content;
-      margin-top: 10px;
-    }
-
-    button {
-      font-family: 'Space Grotesk', sans-serif;
-      padding: 10px 20px;
-      background-color: black;
-      color: #FFF;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .chat-app {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        width: 100%;
-        box-shadow: none;
-      }
-
-      .chat {
-        flex: 1;
-        padding: 20px;
-      }
-
-      .header {
-        border-bottom: 1px solid;
-        padding-bottom: 5px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="styles.css">
   <title>SwiftChat</title>
 </head>
 <body>
@@ -166,69 +38,88 @@
   </div>
 
   <!-- Add the Socket.io script -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    // Establish a connection with the server
-    const socket = io();
+  <!-- Your existing HTML code here -->
 
-    // DOM elements
-    const userNameInput = document.getElementById('user-name');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const messagesContainer = document.querySelector('.messages');
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const userNameInput = document.getElementById('user-name');
+  const messageInput = document.getElementById('message-input');
+  const sendButton = document.getElementById('send-button');
+  const messagesContainer = document.querySelector('.messages');
+  const onlineUsersList = document.querySelector('.online-users');
 
-    // Handle sending messages
-     sendButton.addEventListener('click', () => {
+  function updateUserNameDisplay(userName) {
+    const userNameDisplay = document.getElementById('user-name-display');
+    userNameDisplay.textContent = userName;
+  }
+
+  userNameInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
       const userName = userNameInput.value.trim();
-      const message = messageInput.value.trim();
-      if (userName !== '' && message !== '') {
-        updateUserNameDisplay(userName); // Update the user name display
-        socket.emit('chat message', userName + ': ' + message);
-        messageInput.value = '';
-      }
-    });
-  
-    // Handle receiving messages
-    socket.on('chat message', (msg) => {
-      const messageElement = document.createElement('div');
-      messageElement.textContent = msg;
-      
-      if (msg.startsWith(userNameInput.value.trim() + ': ')) {
-        messageElement.classList.add('message', 'sent');
-      } else {
-        messageElement.classList.add('message', 'received');
-      }
-      
-      messagesContainer.appendChild(messageElement);
-    });
+      if (userName !== '') {
+        // Save the user's name
+        updateUserNameDisplay(userName);
 
-    // Update the user name display
-    function updateUserNameDisplay(userName) {
-      const userNameDisplay = document.getElementById('user-name-display');
-      userNameDisplay.textContent = userName;
+        // Remove cursor focus from the input
+        userNameInput.blur();
+      }
+    }
+  });
+
+  function sendMessage() {
+    const userName = userNameInput.value.trim();
+    const message = messageInput.value.trim();
+    if (userName !== '' && message !== '') {
+      updateUserNameDisplay(userName);
+      socket.emit('chat message', userName + ': ' + message);
+      messageInput.value = '';
+    }
+    messageInput.blur();
+  }
+
+  sendButton.addEventListener('click', sendMessage);
+
+  messageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+
+  socket.on('chat message', (msg) => {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = msg;
+
+    if (msg.startsWith(userNameInput.value.trim() + ': ')) {
+      messageElement.classList.add('message', 'sent');
+    } else {
+      messageElement.classList.add('message', 'received');
     }
 
-    // Keep track of online users
-    const onlineUsersList = document.querySelector('.online-users');
+    messagesContainer.appendChild(messageElement);
 
-    // Handle a new user connecting to the chat
-    socket.on('user connected', (userName) => {
-      const userItem = document.createElement('li');
-      userItem.textContent = userName;
-      onlineUsersList.appendChild(userItem);
-    });
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  });
 
-    // Handle a user disconnecting from the chat
-    socket.on('user disconnected', (userName) => {
-      const userItems = onlineUsersList.getElementsByTagName('li');
-      for (const userItem of userItems) {
-        if (userItem.textContent === userName) {
-          userItem.remove();
-          break;
-        }
+  socket.on('user connected', (userName) => {
+    const userItem = document.createElement('li');
+    userItem.textContent = userName;
+    onlineUsersList.appendChild(userItem);
+  });
+
+  socket.on('user disconnected', (userName) => {
+    const userItems = onlineUsersList.getElementsByTagName('li');
+    for (const userItem of userItems) {
+      if (userItem.textContent === userName) {
+        userItem.remove();
+        break;
       }
-    });
+    }
+  });
 
-  </script>
+</script>
+
 </body>
 </html>
