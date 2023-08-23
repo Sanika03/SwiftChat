@@ -60,8 +60,8 @@ messageInput.addEventListener('keydown', (event) => {
 
 function sendMessage() {
     const userName = userNameInput.value.trim();
-    let message = messageInput.value.trim();
-    let formattedMessage = message; // Default to original message
+    const message = messageInput.value.trim();
+    let formattedMessage = message;
   
     const emojis = {
       react: "⚛️",
@@ -86,22 +86,61 @@ function sendMessage() {
       clearErrorMessage('message-error');
     }
   
-    // Check for each emoji keyword in the message
-    for (const keyword in emojis) {
-      if (message.toLowerCase().includes(keyword)) {
-        // Replace the keyword with the emoji
-        formattedMessage = formattedMessage.replace(
-          new RegExp(keyword, 'gi'), // 'gi' for global and case-insensitive search
-          emojis[keyword]
-        );
+    // Check for special commands
+    if (message.startsWith('/')) {
+      const command = message.slice(1); // Remove the slash '/'
+      switch (command) {
+        case 'help':
+          const helpMessage = "Available commands:\n" +
+            "/alert - Show this message\n" +
+            "/random - Print a random number\n" +
+            "/clear - Clear the chat";
+          alert(helpMessage);
+          messageInput.value = '';
+          return;
+        case 'random':
+          const randomNumber = Math.random() * 1000;
+          formattedMessage = `Here's your random number: ${randomNumber}`;
+          break;
+        case 'clear':
+          messagesContainer.innerHTML = '';
+          messageInput.value = '';
+          return;
+        default:
+          // If the command doesn't match any cases, it's a regular chat message
+          break;
+      }
+    } else {
+      // Check for each emoji keyword in the message
+      for (const keyword in emojis) {
+        if (message.toLowerCase().includes(keyword)) {
+          // Replace the keyword with the emoji
+          formattedMessage = formattedMessage.replace(
+            new RegExp(keyword, 'gi'), // 'gi' for global and case-insensitive search
+            emojis[keyword]
+          );
+        }
       }
     }
   
     updateUserNameDisplay(userName);
-    socket.emit('chat message', userName + ': ' + formattedMessage);
+  
+    // Send message to server only if it's not a /random command
+    if (!message.startsWith('/random')) {
+        // Send regular chat message
+        socket.emit('chat message', userName + ': ' + formattedMessage);
+    } else {
+        // Display locally without sending to server
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = formattedMessage;
+        messageElement.classList.add('message', 'sent'); // Add classes
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  
     messageInput.value = '';
     messageInput.blur();
-}  
+}   
 
 sendButton.addEventListener('click', sendMessage);
 
