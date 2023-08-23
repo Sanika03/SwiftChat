@@ -29,7 +29,14 @@
         <!-- Chat messages will be dynamically added here -->
       </div>
       <!-- New input field for user's name -->
+      <div class="input-error" id="user-name-error">
+        <p></p>
+      </div>
       <input type="text" id="user-name" placeholder="Your Name">
+      <!-- New input field for message -->
+      <div class="input-error" id="message-error">
+        <p></p>
+      </div>
       <div class="input-area">
         <input type="text" id="message-input" placeholder="Type your message...">
         <button id="send-button">Send</button>
@@ -54,6 +61,16 @@
     userNameDisplay.textContent = userName;
   }
 
+  function displayErrorMessage(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = message;
+  }
+
+  function clearErrorMessage(elementId) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.textContent = '';
+  }
+
   userNameInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -64,6 +81,27 @@
 
         // Remove cursor focus from the input
         userNameInput.blur();
+
+        // Clear error message
+        clearErrorMessage('user-name-error');
+      } else {
+        // Show error message
+        displayErrorMessage('user-name-error', 'Please enter a name');
+      }
+    }
+  });
+
+  messageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      // const userName = userNameInput.value.trim();
+      const message = messageInput.value.trim();
+      
+      if (message === '') {
+        displayErrorMessage('message-error', 'Please type a message');
+      } else {
+        clearErrorMessage('message-error');
+        sendMessage();
       }
     }
   });
@@ -81,16 +119,11 @@
 
   sendButton.addEventListener('click', sendMessage);
 
-  messageInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
-
   socket.on('chat message', (msg) => {
     const messageElement = document.createElement('div');
-    messageElement.textContent = msg;
+
+    const formattedMessage = msg.replace(/(.*?):/, '<b>$1:</b>'); // Wrap userName in <b> element
+    messageElement.innerHTML = formattedMessage;
 
     if (msg.startsWith(userNameInput.value.trim() + ': ')) {
       messageElement.classList.add('message', 'sent');
@@ -120,6 +153,5 @@
   });
 
 </script>
-
 </body>
 </html>
