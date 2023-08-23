@@ -110,6 +110,11 @@ input[type="text"] {
     width: 100%;
 }
 
+.input-error {
+    margin-top: 10px;
+    color: rgb(239, 94, 94);
+}
+
 #user-name {
     width: max-content;
     margin-top: 10px;
