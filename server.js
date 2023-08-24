@@ -9,16 +9,30 @@ const io = socketIo(server);
 
 app.use(express.static(__dirname + '/public'));
 
+// Array to store online users
+const onlineUsers = [];
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
+    const userIndex = onlineUsers.indexOf(socket.userName);
+    if (userIndex !== -1) {
+      onlineUsers.splice(userIndex, 1);
+      io.emit('user disconnected', socket.userName);
+    }
   });
 
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
+
+  socket.on('user connected', (userName) => {
+    socket.userName = userName;
+    onlineUsers.push(userName);
+    io.emit('user connected', onlineUsers); // Sending the updated array of online users
+  });  
 });
 
 const PORT = process.env.PORT || 4000;
