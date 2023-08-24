@@ -172,10 +172,11 @@ function sendMessage() {
   } else {
     // Check for each emoji keyword in the message
     for (const keyword in emojis) {
-      if (message.toLowerCase().includes(keyword)) {
+      const regex = new RegExp(`\\b${keyword}\\b`, 'gi'); // Use word boundaries to match whole words
+      if (message.toLowerCase().match(regex)) {
         // Replace the keyword with the emoji
         formattedMessage = formattedMessage.replace(
-          new RegExp(keyword, 'gi'), // 'gi' for global and case-insensitive search
+          regex,
           emojis[keyword]
         );
       }
