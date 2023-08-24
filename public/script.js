@@ -196,7 +196,6 @@ function sendMessage() {
   }
 
   messageInput.value = '';
-  messageInput.blur();
 }
 
 function updateOnlineUserCount(count) {
