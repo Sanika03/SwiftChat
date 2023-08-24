@@ -94,9 +94,12 @@ function sendMessage() {
 
     if (command === 'help') {
       const helpMessage = "Available commands:\n" +
-        "/alert - Show this message\n" +
-        "/random - Print a random number\n" +
-        "/clear - Clear the chat";
+      "/alert - Show this message\n" +
+      "/random - Print a random number\n" +
+      "/clear - Clear the chat\n" +
+      "/rem <name> <value> - Set a value by name\n" +
+      "/rem <name> - Recall the value by name\n" +
+      "/calc <expression> - Perform arithmetic calculations (+, -, *, /)\n";
       alert(helpMessage);
       messageInput.value = '';
       return;
