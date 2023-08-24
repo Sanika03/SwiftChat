@@ -140,7 +140,7 @@ function sendMessage() {
 
 function updateOnlineUserCount(count) {
   const onlineCountElement = document.querySelector('.online-count');
-  onlineCountElement.textContent = `(${count})`;
+  onlineCountElement.textContent = `( ${count} )`;
 }
 
 sendButton.addEventListener('click', sendMessage);
