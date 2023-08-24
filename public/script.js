@@ -138,6 +138,11 @@ function sendMessage() {
   messageInput.blur();
 }
 
+function updateOnlineUserCount(count) {
+  const onlineCountElement = document.querySelector('.online-count');
+  onlineCountElement.textContent = `(${count})`;
+}
+
 sendButton.addEventListener('click', sendMessage);
 
 socket.on('chat message', (msg) => {
@@ -158,6 +163,7 @@ socket.on('chat message', (msg) => {
 });
 
 socket.on('user connected', (onlineUsers) => {
+  updateOnlineUserCount(onlineUsers.length);
   onlineUsersList.innerHTML = ''; // Clear the list before adding updated users
   onlineUsers.forEach((userName) => {
     const userItem = document.createElement('li');
@@ -167,6 +173,7 @@ socket.on('user connected', (onlineUsers) => {
 });
 
 socket.on('user disconnected', (userName) => {
+  updateOnlineUserCount(onlineUsers.length);
   const userItems = onlineUsersList.getElementsByTagName('li');
   for (const userItem of userItems) {
     if (userItem.textContent === userName) {
