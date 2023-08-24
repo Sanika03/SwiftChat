@@ -233,7 +233,7 @@ socket.on('user connected', (onlineUsers) => {
   });
 });
 
-socket.on('user disconnected', (userName) => {
+socket.on('user disconnected', (onlineUsers, userName) => {
   updateOnlineUserCount(onlineUsers.length);
   const userItems = onlineUsersList.getElementsByTagName('li');
   for (const userItem of userItems) {

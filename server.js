@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
     const userIndex = onlineUsers.indexOf(socket.userName);
     if (userIndex !== -1) {
       onlineUsers.splice(userIndex, 1);
-      io.emit('user disconnected', socket.userName);
+      io.emit('user disconnected', onlineUsers, socket.userName); // Sending both the array and the userName
     }
   });
 
