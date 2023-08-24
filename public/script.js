@@ -5,6 +5,8 @@ const sendButton = document.getElementById('send-button');
 const messagesContainer = document.querySelector('.messages');
 const onlineUsersList = document.querySelector('.online-users');
 
+let isNameEntered = false;
+
 function updateUserNameDisplay(userName) {
   document.getElementById('user-name-display').textContent = userName;
 }
@@ -27,6 +29,11 @@ userNameInput.addEventListener('keydown', (event) => {
       // Remove cursor focus from the input
       userNameInput.blur();
       clearErrorMessage('user-name-error');
+
+      // Emit 'user connected' event to the server
+      socket.emit('user connected', userName);
+      userNameInput.disabled = true; 
+      isNameEntered = true;
     } else {
       displayErrorMessage('user-name-error', 'Please enter a name');
     }
@@ -150,10 +157,13 @@ socket.on('chat message', (msg) => {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 });
 
-socket.on('user connected', (userName) => {
-  const userItem = document.createElement('li');
-  userItem.textContent = userName;
-  onlineUsersList.appendChild(userItem);
+socket.on('user connected', (onlineUsers) => {
+  onlineUsersList.innerHTML = ''; // Clear the list before adding updated users
+  onlineUsers.forEach((userName) => {
+    const userItem = document.createElement('li');
+    userItem.textContent = userName;
+    onlineUsersList.appendChild(userItem);
+  });
 });
 
 socket.on('user disconnected', (userName) => {
