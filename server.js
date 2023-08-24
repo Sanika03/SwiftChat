@@ -32,7 +32,10 @@ io.on('connection', (socket) => {
     socket.userName = userName;
     onlineUsers.push(userName);
     io.emit('user connected', onlineUsers); // Sending the updated array of online users
-  });  
+  });
+
+  // Emit the initial list of online users to the connected socket
+  socket.emit('user connected', onlineUsers);
 });
 
 const PORT = process.env.PORT || 4000;
