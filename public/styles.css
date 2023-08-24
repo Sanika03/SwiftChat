@@ -23,12 +23,20 @@ body, h1, h2, div, p {
     box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
     background-color: rgb(78, 74, 74);
     border-right: 1px solid #ddd;
+    max-height: max-content;
+    min-height: 10rem;
+    overflow-y: auto;
 }
 
 .header {
     padding-bottom: 10px;
     margin-bottom: 20px;
     background-color: rgb(78, 74, 74);
+}
+
+.heading {
+    border-bottom: 1px solid;
+    padding-bottom: 5px;
 }
 
 .contacts {
@@ -50,19 +58,19 @@ body, h1, h2, div, p {
 .messages {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 225px);
+    max-height: calc(100vh - 15rem);
     flex-wrap: wrap;
 }
 
-.messages::-webkit-scrollbar {
-    width: 0.3rem;
+.messages::-webkit-scrollbar, .sidebar::-webkit-scrollbar {
+    width: 0.2rem;
 }
 
-.messages::-webkit-scrollbar-track {
+.messages::-webkit-scrollbar-track, .sidebar::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.messages::-webkit-scrollbar-thumb {
+.messages::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb {
     background: rgba(243, 240, 240, 0.877);
     border-radius: 0.25rem;
 }
@@ -131,6 +139,12 @@ button {
     margin-left: 10px;
 }
 
+li {
+    margin: 1rem 0 0 1.5rem;
+    list-style: disc;
+
+}
+
 @media (max-width: 768px) {
     .chat-app {
         flex-direction: column;
@@ -147,7 +161,10 @@ button {
     }
 
     .header {
-        border-bottom: 1px solid;
         padding-bottom: 5px;
+    }
+
+    .sidebar {
+        max-height: 10rem;
     }
 }
