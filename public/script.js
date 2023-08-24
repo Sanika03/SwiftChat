@@ -108,7 +108,6 @@ function sendMessage() {
       messageInput.value = '';
       return;
     } else if (commandParts[0] === 'rem') {
-      let formattedMessage = null;
     
       if (commandParts.length >= 3) {
         const remName = commandParts[1];
@@ -127,14 +126,46 @@ function sendMessage() {
       } else {
         formattedMessage = "Invalid /rem command format";
       }
-
-      // Display the formattedMessage in the chat
-      const messageElement = document.createElement('div');
-      messageElement.innerHTML = formattedMessage;
-      messageElement.classList.add('message', 'sent'); // Add classes
-      messagesContainer.appendChild(messageElement);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }    
+    } else if (commandParts[0] === 'calc') {
+      // Handle /calc command here
+      if (commandParts.length === 4) {
+        try {
+          const leftOperand = parseFloat(commandParts[1]);
+          const operator = commandParts[2];
+          const rightOperand = parseFloat(commandParts[3]);
+    
+          if (isNaN(leftOperand) || isNaN(rightOperand)) {
+            formattedMessage = `Invalid operands`;
+          } else {
+            let result;
+            switch (operator) {
+              case '+':
+                result = leftOperand + rightOperand;
+                break;
+              case '-':
+                result = leftOperand - rightOperand;
+                break;
+              case '*':
+                result = leftOperand * rightOperand;
+                break;
+              case '/':
+                result = leftOperand / rightOperand;
+                break;
+              default:
+                formattedMessage = "Invalid operator";
+            }
+    
+            if (result !== undefined) {
+              formattedMessage = `Result: ${result}`;
+            }
+          }
+        } catch (error) {
+          formattedMessage = "Invalid expression";
+        }
+      } else {
+        formattedMessage = "Invalid /calc command format. Make sure there is gap between operands and operators";
+      }
+    }
   } else {
     // Check for each emoji keyword in the message
     for (const keyword in emojis) {
@@ -150,9 +181,10 @@ function sendMessage() {
 
   updateUserNameDisplay(userName);
 
-  if (!message.startsWith('/random') && !message.startsWith('/rem')) {
-    socket.emit('chat message', userName + ': ' + formattedMessage);
-  } else if (message.startsWith('/random')) {
+  const command = message.slice(1);
+  if (!message.startsWith('/random') && !command.startsWith('rem') && !command.startsWith('calc')) {
+      socket.emit('chat message', userName + ': ' + formattedMessage);
+  } else {
     const messageElement = document.createElement('div');
     messageElement.innerHTML = formattedMessage;
     messageElement.classList.add('message', 'sent'); // Add classes
