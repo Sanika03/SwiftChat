@@ -127,8 +127,7 @@ function sendMessage() {
       } else {
         formattedMessage = "Invalid /rem command format";
       }
-      
-      messageInput.value = '';
+
       // Display the formattedMessage in the chat
       const messageElement = document.createElement('div');
       messageElement.innerHTML = formattedMessage;
@@ -151,14 +150,9 @@ function sendMessage() {
 
   updateUserNameDisplay(userName);
 
-  if (!message.startsWith('/random')) {
-    const command = message.slice(1); // Remove the slash '/'
-    if (!command.startsWith('rem')) {
-      // Send regular chat message
-      socket.emit('chat message', userName + ': ' + formattedMessage);
-    }
-  } else {
-    // Display locally without sending to server
+  if (!message.startsWith('/random') && !message.startsWith('/rem')) {
+    socket.emit('chat message', userName + ': ' + formattedMessage);
+  } else if (message.startsWith('/random')) {
     const messageElement = document.createElement('div');
     messageElement.innerHTML = formattedMessage;
     messageElement.classList.add('message', 'sent'); // Add classes
