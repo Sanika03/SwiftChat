@@ -6,6 +6,7 @@ const messagesContainer = document.querySelector('.messages');
 const onlineUsersList = document.querySelector('.online-users');
 
 let isNameEntered = false;
+const remData = {};
 
 function updateUserNameDisplay(userName) {
   document.getElementById('user-name-display').textContent = userName;
@@ -89,24 +90,52 @@ function sendMessage() {
   // Check for special commands
   if (message.startsWith('/')) {
     const command = message.slice(1); // Remove the slash '/'
-    switch (command) {
-      case 'help':
-        const helpMessage = "Available commands:\n" +
-          "/alert - Show this message\n" +
-          "/random - Print a random number\n" +
-          "/clear - Clear the chat";
-        alert(helpMessage);
-        messageInput.value = '';
-        return;
-      case 'random':
-        const randomNumber = Math.random() * 1000;
-        formattedMessage = `Here's your random number: ${randomNumber}`;
-        break;
-      case 'clear':
-        messagesContainer.innerHTML = '';
-        messageInput.value = '';
-        return;
-    }
+    const commandParts = command.split(' ');
+
+    if (command === 'help') {
+      const helpMessage = "Available commands:\n" +
+        "/alert - Show this message\n" +
+        "/random - Print a random number\n" +
+        "/clear - Clear the chat";
+      alert(helpMessage);
+      messageInput.value = '';
+      return;
+    } else if (command === 'random') {
+      const randomNumber = Math.random() * 1000;
+      formattedMessage = `Here's your random number: ${randomNumber}`;
+    } else if (command === 'clear') {
+      messagesContainer.innerHTML = '';
+      messageInput.value = '';
+      return;
+    } else if (commandParts[0] === 'rem') {
+      let formattedMessage = null;
+    
+      if (commandParts.length >= 3) {
+        const remName = commandParts[1];
+        const remValue = commandParts.slice(2).join(' '); // Combine the rest of the parts as value   
+        remData[remName] = remValue;
+        formattedMessage = `Added value for ${remName} as ${remValue}`;
+      } else if (commandParts.length === 2) {
+        const remName = commandParts[1];
+        if (remData.hasOwnProperty(remName)) {
+          formattedMessage = `Value for ${remName} is ${remData[remName]}`;
+        } else {
+          formattedMessage = `No value has been added for ${remName}`;
+        }
+      } else if (commandParts.length === 1) {
+          formattedMessage = "Give complete command with name and value";
+      } else {
+        formattedMessage = "Invalid /rem command format";
+      }
+      
+      messageInput.value = '';
+      // Display the formattedMessage in the chat
+      const messageElement = document.createElement('div');
+      messageElement.innerHTML = formattedMessage;
+      messageElement.classList.add('message', 'sent'); // Add classes
+      messagesContainer.appendChild(messageElement);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }    
   } else {
     // Check for each emoji keyword in the message
     for (const keyword in emojis) {
@@ -123,8 +152,11 @@ function sendMessage() {
   updateUserNameDisplay(userName);
 
   if (!message.startsWith('/random')) {
-    // Send regular chat message
-    socket.emit('chat message', userName + ': ' + formattedMessage);
+    const command = message.slice(1); // Remove the slash '/'
+    if (!command.startsWith('rem')) {
+      // Send regular chat message
+      socket.emit('chat message', userName + ': ' + formattedMessage);
+    }
   } else {
     // Display locally without sending to server
     const messageElement = document.createElement('div');
